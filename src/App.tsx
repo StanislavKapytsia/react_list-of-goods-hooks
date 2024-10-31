@@ -22,14 +22,18 @@ enum Way {
   'Success' = 'is-success',
 }
 
+function isValidWay(value: Way): value is Way {
+  return Object.values(Way).includes(value);
+}
+
 function getSorted(obj: string[], way: Way) {
   const currentGoods = [...obj];
 
   currentGoods.sort((el1, el2) => {
     switch (way) {
-      case 'is-info':
+      case Way.Info:
         return el1.localeCompare(el2);
-      case 'is-success':
+      case Way.Success:
         return el1.length - el2.length;
       default:
         return 0;
@@ -41,12 +45,14 @@ function getSorted(obj: string[], way: Way) {
 
 export const App: React.FC = () => {
   const [selectItem, setSelectItem] = useState('');
-  const [selReverse, setselReverse] = useState('');
+  const [selReverse, setselReverse] = useState(false);
 
-  const goods = getSorted(goodsFromServer, selectItem as Way);
+  const goods = isValidWay(selectItem as Way)
+    ? getSorted(goodsFromServer, selectItem as Way)
+    : goodsFromServer;
 
   function reset() {
-    setselReverse('');
+    setselReverse(false);
     setSelectItem('');
   }
 
@@ -75,9 +81,9 @@ export const App: React.FC = () => {
 
         <button
           type="button"
-          className={`button is-warning ${selReverse === 'is-warning' ? null : 'is-light'}`}
+          className={`button is-warning ${selReverse ? null : 'is-light'}`}
           onClick={() =>
-            selReverse ? setselReverse('') : setselReverse('is-warning')
+            selReverse ? setselReverse(false) : setselReverse(true)
           }
         >
           Reverse
